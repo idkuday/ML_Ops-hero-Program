@@ -58,4 +58,23 @@ ngrok config add-authtoken <NGROK_AUTH_TOKEN>
 # open HTTP tunnel to Jenkins (8080)
 ngrok http 8080
 # ngrok will print a forwarding URL like https://abcd-1234.ngrok.io
-# test commit
+
+
+# setting in github, remember to add "github-webhook/" after you input your ngrok link
+
+![alt text](image-3.png)
+
+
+
+
+# setting in Jenkins UI
+
+![alt text](image.png)
+
+
+![alt text](image-1.png)
+
+
+![alt text](image-2.png)
+
+# uncheck the lightweight checkout
