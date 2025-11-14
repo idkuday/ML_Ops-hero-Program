@@ -10,3 +10,4 @@ second example
 
 commit without any message
 # test commit
+# test commit
