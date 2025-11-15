@@ -105,6 +105,25 @@ ensure_jenkins_docker_access() {
   docker restart "${JENKINS_CONTAINER}"
 }
 
+ensure_jenkins_kubectl() {
+  if ! docker ps --format '{{.Names}}' | grep -qx "${JENKINS_CONTAINER}"; then
+    log "Jenkins container (${JENKINS_CONTAINER}) not running. Skipping kubectl install."
+    return
+  fi
+
+  log "Installing kubectl CLI inside ${JENKINS_CONTAINER}"
+  docker exec -u root "${JENKINS_CONTAINER}" bash -lc "
+    set -e
+    apt-get update
+    apt-get install -y ca-certificates curl gnupg
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    echo \"deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main\" > /etc/apt/sources.list.d/kubernetes.list
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install -y kubectl
+  "
+}
+
 verify_app() {
   log "Current v2 container status"
   docker ps --filter "name=${APP_CONTAINER}"
@@ -129,6 +148,7 @@ main() {
   patch_jenkins_network
   ensure_jenkins_python_tools
   ensure_jenkins_docker_access
+  ensure_jenkins_kubectl
   verify_app
 
   log "Done. Jenkins + ngrok setup stays untouched; v2 app runs independently on port ${APP_PORT}."
